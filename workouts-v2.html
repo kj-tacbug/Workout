@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Workouts">
+<title>Workouts</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    background: #000000;
+    font-family: 'Courier New', monospace;
+    color: #fff;
+    padding: 16px;
+    padding-bottom: 50px;
+    min-height: 100vh;
+  }
+  .tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .tab {
+    flex: 1;
+    padding: 14px 8px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: 1px solid #222;
+    background: #111;
+    color: #555;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .tab.active-court { background: rgba(255,107,53,0.2); border-color: #FF6B35; color: #FF6B35; }
+  .tab.active-turf { background: rgba(78,205,196,0.2); border-color: #4ECDC4; color: #4ECDC4; }
+  .page { display: none; }
+  .page.active { display: block; }
+  .header { text-align: center; margin-bottom: 24px; padding-bottom: 16px; }
+  .header-court { border-bottom: 2px solid #FF6B35; }
+  .header-turf { border-bottom: 2px solid #4ECDC4; }
+  .header-emoji { font-size: 42px; }
+  .header-title { font-size: 28px; font-weight: 900; letter-spacing: 6px; text-transform: uppercase; margin-top: 6px; }
+  .court-color { color: #FF6B35; }
+  .turf-color { color: #4ECDC4; }
+  .header-sub { font-size: 11px; color: #555; letter-spacing: 3px; margin-top: 6px; }
+  .section { margin-bottom: 12px; border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: border 0.2s; }
+  .section.open { border-color: var(--color); }
+  .section-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; background: #111; cursor: pointer; user-select: none; transition: background 0.2s; }
+  .section.open .section-header { background: color-mix(in srgb, var(--color) 18%, transparent); }
+  .section-left { display: flex; align-items: center; gap: 14px; }
+  .section-emoji { font-size: 26px; }
+  .section-title { font-size: 15px; font-weight: 900; letter-spacing: 2px; color: #fff; text-transform: uppercase; }
+  .section.open .section-title { color: var(--color); }
+  .section-time { font-size: 11px; letter-spacing: 1px; margin-top: 3px; color: var(--color); }
+  .arrow { font-size: 16px; color: var(--color); transition: transform 0.25s; }
+  .section.open .arrow { transform: rotate(180deg); }
+  .section-body { display: none; background: #0a0a0a; padding: 14px 18px; border-top: 1px solid color-mix(in srgb, var(--color) 30%, transparent); }
+  .section.open .section-body { display: block; }
+  .item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #1a1a1a; font-size: 15px; color: #ddd; line-height: 1.5; }
+  .item:last-child { border-bottom: none; }
+  .dot { color: var(--color); font-size: 11px; margin-top: 4px; flex-shrink: 0; }
+  .sub-title { font-size: 11px; font-weight: 900; letter-spacing: 2px; color: var(--color); text-transform: uppercase; margin: 14px 0 8px; }
+  .sub-title:first-child { margin-top: 0; }
+  .banner-box { margin-top: 18px; border-radius: 12px; padding: 16px 18px; }
+  .league-box { background: rgba(255,71,87,0.12); border: 1px solid #FF4757; }
+  .reminder-box { background: rgba(78,205,196,0.12); border: 1px solid #4ECDC4; }
+  .banner-title { font-size: 11px; font-weight: 900; letter-spacing: 2px; margin-bottom: 12px; text-transform: uppercase; }
+  .league-box .banner-title { color: #FF4757; }
+  .reminder-box .banner-title { color: #4ECDC4; }
+  .banner-item { display: flex; gap: 10px; padding: 5px 0; font-size: 14px; color: #ddd; line-height: 1.5; }
+  .league-box .banner-item span { color: #FF4757; flex-shrink: 0; }
+  .reminder-box .banner-item span { color: #4ECDC4; flex-shrink: 0; }
+  .footer { text-align: center; margin-top: 24px; font-size: 11px; color: #333; letter-spacing: 3px; }
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <div class="tab active-court" onclick="switchTab('court')">🏀 Court Day</div>
+  <div class="tab" onclick="switchTab('turf')">🌿 Turf Day</div>
+</div>
+
+<!-- COURT DAY -->
+<div id="court" class="page active">
+  <div class="header header-court">
+    <div class="header-emoji">🏀</div>
+    <div class="header-title court-color">COURT DAY</div>
+    <div class="header-sub">INDOOR — TAP TO EXPAND</div>
+  </div>
+
+  <div class="section" style="--color:#FF6B35" onclick="toggle(this)">
+    <div class="section-header">
+      <div class="section-left"><span class="section-emoji">🔥</span><div><div class="section-title">Warmup</div><div class="section-time">10 min</div></div></div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="item"><span class="dot">▶</span>Jog baseline to baseline x3</div>
+      <div class="item"><span class="dot">▶</span>Leg swings 2x10</div>
+      <div class="item"><span class="dot">▶</span>Hip circles 2x10</div>
+      <div class="item"><span class="dot">▶</span>Pogo jumps 2x10</div>
+      <div class="item"><span class="dot">▶</span>Progressive shooting 5 min — no movement yet</div>
+    </div>
+  </div>
+
+  <div class="section" style="--color:#F7C948" onclick="toggle(this)">
+    <div class="section-header">
+      <div class="section-left"><span class="section-emoji">🎯</span><div><div class="section-title">Skill 1 — Shooting</div><div class="section-time">15 min</div></div></div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="sub-title">Spot Shooting</div>
+      <div class="item"><span class="dot">▶</span>5 spots: L corner, L wing, top, R wing, R corner</div>
+      <div class="item"><span class="dot">▶</span>3 attempts each spot</div>
+      <div class="item"><span class="dot">▶</span>Sprint half court & back after every make</div>
+      <div class="sub-title">Pull Up Jumpers</div>
+      <div class="item"><span class="dot">▶</span>Dribble from half court — pull up at free throw line</div>
+      <div class="item"><span class="dot">▶</span>5 reps each side</div>
+      <div class="item"><span class="dot">▶</span>Sprint baseline & back after every make</div>
+      <div class="sub-title">Midrange</div>
+      <div class="item"><span class="dot">▶</span>Elbow jumpers left & right — 5 reps each</div>
+      <div class="item"><span class="dot">▶</span>Sprint baseline & back after every make</div>
+    </div>
+  </div>
+
+  <div class="section" style="--color:#4ECDC4" onclick="toggle(this)">
+    <div class="section-header">
+      <div class="section-left"><span class="section-emoji">🏀</span><div><div class="section-title">Skill 2 — Handles & Finishing</div><div class="section-time">15 min</div></div></div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="sub-title">Full Court Dribble Finishes</div>
+      <div class="item"><span class="dot">▶</span>Right hand only — layup</div>
+      <div class="item"><span class="dot">▶</span>Left hand only — layup</div>
+      <div class="item"><span class="dot">▶</span>Crossover series — floater</div>
+      <div class="item"><span class="dot">▶</span>Between legs — reverse layup</div>
+      <div class="item"><span class="dot">▶</span>3 reps each — walk back recovery</div>
+      <div class="sub-title">Floater Package</div>
+      <div class="item"><span class="dot">▶</span>Right side x5 / Left side x5</div>
+      <div class="item"><span class="dot">▶</span>Sprint half court & back after every make</div>
+      <div class="sub-title">Layup Package</div>
+      <div class="item"><span class="dot">▶</span>Standard x5 each side</div>
+      <div class="item"><span class="dot">▶</span>Euro step x5 each side</div>
+      <div class="item"><span class="dot">▶</span>Reverse x5 each side</div>
+      <div class="item"><span class="dot">▶</span>Sprint baseline & back after every make</div>
+    </div>
+  </div>
+
+  <div class="section" style="--color:#FF4757" onclick="toggle(this)">
+    <div class="section-header">
+      <div class="section-left"><span class="section-emoji">💪</span><div><div class="section-title">Conditioning</div><div class="section-time">20 min</div></div></div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="sub-title">Round 1 — Full Court Finishes</div>
+      <div class="item"><span class="dot">▶</span>Dribble full court — finish strong</div>
+      <div class="item"><span class="dot">▶</span>Sprint back immediately — no walking</div>
+      <div class="item"><span class="dot">▶</span>Alternate hands each rep — 8 total reps</div>
+      <div class="item"><span class="dot">▶</span>Rest 60 sec</div>
+      <div class="sub-title">Round 2 — Spot Shooting</div>
+      <div class="item"><span class="dot">▶</span>Shoot from 5 spots</div>
+      <div class="item"><span class="dot">▶</span>Make or miss — sprint half court & back</div>
+      <div class="item"><span class="dot">▶</span>Repeat all 5 spots twice — no rest</div>
+      <div class="sub-title">Round 3 — 21</div>
+      <div class="item"><span class="dot">▶</span>Every miss — sprint half court & back</div>
+      <div class="item"><span class="dot">▶</span>Every 3 make — counts double, sprint full court & back</div>
+      <div class="item"><span class="dot">▶</span>Finish the game no matter what</div>
+      <div class="sub-title">Round 4 — Final Burnout</div>
+      <div class="item"><span class="dot">▶</span>Full court coast to coast x5 — max pace</div>
+      <div class="item"><span class="dot">▶</span>Finish with layup or floater each time</div>
+      <div class="item"><span class="dot">▶</span>Rest 90 sec — then 5 free throws to finish</div>
+    </div>
+  </div>
+
+  <div class="section" style="--color:#A29BFE" onclick="toggle(this)">
+    <div class="section-header">
+      <div class="section-left"><span class="section-emoji">🧘🏾</span><div><div class="section-title">Cool Down</div></div></div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="item"><span class="dot">▶</span>Walk baseline to baseline x3</div>
+      <div class="item"><span class="dot">▶</span>Hip flexor stretch 60 sec each side</div>
+      <div class="item"><span class="dot">▶</span>Calf stretch 60 sec each side</div>
+      <div class="item"><span class="dot">▶</span>Hamstring stretch 60 sec each side</div>
+      <div class="item"><span class="dot">▶</span>Couch stretch 60 sec each side</div>
+      <div class="item"><span class="dot">▶</span>Ankle rolls 2x10 each foot</div>
+    </div>
+  </div>
+
+  <div class="banner-box league-box">
+    <div class="banner-title">🏆 Pre League — Before The 31st</div>
+    <div class="banner-item"><span>▶</span>Sprint intensity +10% each session</div>
+    <div class="banner-item"><span>▶</span>Add 2 extra full court finishes weekly</div>
+    <div class="banner-item"><span>▶</span>Track when you gas out — improve weekly</div>
+    <div class="banner-item"><span>▶</span>Free throws at end every session</div>
+    <div class="banner-item"><span>▶</span>Arrive 15 min early — always warm up first</div>
+  </div>
+  <div class="footer">BUILT FOR THE COURT 🏀</div>
+</div>
+
+<!-- TURF DAY -->
+<div id="turf" class="page">
+  <div class="header header-turf">
+    <div class="header-emoji">🌿</div>
+    <div class="header-title turf-color">TURF DAY</div>
+    <div class="header-sub">ZERO EQUIPMENT — TAP TO EXPAND</div>
+  </div>
+
+  <div class="section" style="--color:#4ECDC4" onclick="toggle(this)">
+    <div class="section-header">
+      <div class="section-left"><span class="section-emoji">🔥</span><div><div class="section-title">Warmup</div><div class="section-time">10 min</div></div></div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="item"><span class="dot">▶</span>Light jog 3 min</div>
+      <div class="item"><span class="dot">▶</span>Leg swings 2x10 each direction</div>
+      <div class="item"><span class="dot">▶</span>Hip circles 2x10</div>
+      <div class="item"><span class="dot">▶</span>Bodyweight squats 2x15</div>
+      <div class="item"><span class="dot">▶</span>High knees 2x20 — fast and snappy</div>
+      <div class="item"><span class="dot">▶</span>Butt kicks 2x20 — fast and snappy</div>
+      <div class="item"><span class="dot">▶</span>Ankle bounces 2x20 — quick and light</div>
+    </div>
+  </div>
+
+  <div class="section" style="--color:#F7C948" onclick="toggle(this)">
+    <div class="section-header">
+      <div class="section-left"><span class="section-emoji">⚡</span><div><div class="section-title">Block 1 — Contrast Training</div><div class="section-time">Fast Twitch Activator</div></div></div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="item"><span class="dot">▶</span>Reverse lunges 3x6 each leg — 3/1/1 tempo slow</div>
+      <div class="item"><span class="dot">▶</span>Immediately into max effort vertical jump x3</div>
+      <div class="item"><span class="dot">▶</span>Explode as fast as possible off the ground</div>
+      <div class="item"><span class="dot">▶</span>Rest 2 min — repeat 3 rounds</div>
+      <div class="item"><span class="dot">▶</span>Slow to fast contrast forces fast twitch to fire</div>
+    </div>
+  </div>
+
+  <div class="section" style="--color:#FF6B35" onclick="toggle(this)">
+    <div class="section-header">
+      <div class="section-left"><span class="section-emoji">🔁</span><div><div class="section-title">Block 2 — Reactive Power</div></div></div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="item"><span class="dot">▶</span>Pogo jumps 4x15 — min ground contact, balls of feet only</div>
+      <div class="item"><span class="dot">▶</span>Immediately into broad jumps 3x5 — max distance</div>
+      <div class="item"><span class="dot">▶</span>Stick every landing 2 sec before moving</div>
+      <div class="item"><span class="dot">▶</span>Rest 90 sec — repeat</div>
+    </div>
+  </div>
+
+  <div class="section" style="--color:#A29BFE" onclick="toggle(this)">
+    <div class="section-header">
+      <div class="section-left"><span class="section-emoji">🦵</span><div><div class="section-title">Block 3 — Single Leg Power</div></div></div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="item"><span class="dot">▶</span>Speed bounds 3x8 each leg — aggressive single leg hops forward</div>
+      <div class="item"><span class="dot">▶</span>Immediately into single leg glute bridge 3x12 each leg</div>
+      <div class="item"><span class="dot">▶</span>Glute bridge tempo 3/1/1 — slow and controlled</div>
+      <div class="item"><span class="dot">▶</span>Rest 90 sec — repeat</div>
+    </div>
+  </div>
+
+  <div class="section" style="--color:#FF4757" onclick="toggle(this)">
+    <div class="section-header">
+      <div class="section-left"><span class="section-emoji">🚀</span><div><div class="section-title">Block 4 — Vertical Jump Block</div><div class="section-time">Max Effort</div></div></div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="sub-title">Reactive Jump Squats</div>
+      <div class="item"><span class="dot">▶</span>Drop fast into quarter squat</div>
+      <div class="item"><span class="dot">▶</span>Immediately explode up — max height</div>
+      <div class="item"><span class="dot">▶</span>Land soft — absorb 2 sec — reset</div>
+      <div class="item"><span class="dot">▶</span>3x5 — rest 90 sec between sets</div>
+      <div class="sub-title">Approach Jumps</div>
+      <div class="item"><span class="dot">▶</span>3x5 at 75-80% effort</div>
+      <div class="item"><span class="dot">▶</span>Full arm swing — explode through the ground</div>
+      <div class="item"><span class="dot">▶</span>Rest 2 min between sets</div>
+      <div class="sub-title">Standing Vertical Jumps</div>
+      <div class="item"><span class="dot">▶</span>3x5 — maximum effort every single rep</div>
+      <div class="item"><span class="dot">▶</span>Rest 2 min between sets</div>
+      <div class="item"><span class="dot">▶</span>Never half effort — full power or don't do it</div>
+    </div>
+  </div>
+
+  <div class="section" style="--color:#FF6B35" onclick="toggle(this)">
+    <div class="section-header">
+      <div class="section-left"><span class="section-emoji">💨</span><div><div class="section-title">Sprint Finisher</div><div class="section-time">Fast Twitch Burnout</div></div></div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="item"><span class="dot">▶</span>10 yard sprints x4 — first step explosion</div>
+      <div class="item"><span class="dot">▶</span>20 yard sprints x3 — full acceleration</div>
+      <div class="item"><span class="dot">▶</span>Reactive sprint x3 — sprint 10 yards, shuffle 5, sprint back</div>
+      <div class="item"><span class="dot">▶</span>Rest 90 sec between each</div>
+    </div>
+  </div>
+
+  <div class="section" style="--color:#A29BFE" onclick="toggle(this)">
+    <div class="section-header">
+      <div class="section-left"><span class="section-emoji">🧘🏾</span><div><div class="section-title">Cool Down</div></div></div>
+      <div class="arrow">▼</div>
+    </div>
+    <div class="section-body">
+      <div class="item"><span class="dot">▶</span>Walk 5 min easy</div>
+      <div class="item"><span class="dot">▶</span>Hip flexor stretch 60 sec each side</div>
+      <div class="item"><span class="dot">▶</span>Couch stretch 60 sec each side</div>
+      <div class="item"><span class="dot">▶</span>Calf stretch 60 sec each side</div>
+      <div class="item"><span class="dot">▶</span>Hamstring stretch 60 sec each side</div>
+      <div class="item"><span class="dot">▶</span>Ankle rolls 2x10 each foot</div>
+      <div class="item"><span class="dot">▶</span>Hip circles 2x10</div>
+    </div>
+  </div>
+
+  <div class="banner-box reminder-box">
+    <div class="banner-title">🧠 Key Reminders</div>
+    <div class="banner-item"><span>▶</span>Max intent on every explosive movement — no half efforts</div>
+    <div class="banner-item"><span>▶</span>Pogos — ground contact as short as possible</div>
+    <div class="banner-item"><span>▶</span>Rest fully between vertical jump sets</div>
+    <div class="banner-item"><span>▶</span>Never do fast twitch work when fatigued</div>
+    <div class="banner-item"><span>▶</span>Block 1 contrast pairing — never skip it</div>
+  </div>
+  <div class="footer">BUILT FOR THE TURF 🌿</div>
+</div>
+
+<script>
+  function toggle(el) { el.classList.toggle('open'); }
+  function switchTab(tab) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active-court','active-turf'));
+    document.getElementById(tab).classList.add('active');
+    const tabs = document.querySelectorAll('.tab');
+    if (tab === 'court') { tabs[0].classList.add('active-court'); }
+    else { tabs[1].classList.add('active-turf'); }
+    window.scrollTo(0,0);
+  }
+</script>
+</body>
+</html>
